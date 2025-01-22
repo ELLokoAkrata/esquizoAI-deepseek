@@ -1,0 +1,6 @@
+openai>=1.0.0
+python-dotenv>=0.19.0
+rich>=10.0.0  # Para terminal styling
+prompt_toolkit>=3.0.0  # Para input handling
+pyfiglet>=0.8.post1  # Para ASCII art
+colorama>=0.4.4  # Para colores en Windows 

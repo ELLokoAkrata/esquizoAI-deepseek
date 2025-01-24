@@ -1,57 +1,90 @@
 import json
 from openai import OpenAI
-from typing import List, Dict, Optional
+from typing import Generator, Dict, List
 import config
 
 class DeepSeekClient:
-    def __init__(self):
-        if not config.DEEPSEEK_API_KEY:
-            raise ValueError("¡PSYCHO! Necesitas setear la variable de entorno DEEPSEEK_API_KEY")
+    def __init__(self, model_type: str = "reasoner"):
+        self.model_type = model_type
+        self.base_url = "https://api.deepseek.com" if model_type == "reasoner" else "https://api.deepseek.com/v1"
         
         self.client = OpenAI(
             api_key=config.DEEPSEEK_API_KEY,
-            base_url=config.BASE_URL
+            base_url=self.base_url
         )
         
-        # Cargar el system prompt desde rebel.json
         with open(config.REBEL_JSON_PATH, 'r', encoding='utf-8') as f:
-            rebel_config = json.load(f)
-            self.system_prompt = rebel_config["system_prompt"]
+            self.system_config = json.load(f)
         
-        self.messages: List[Dict[str, str]] = [
-            {"role": "system", "content": json.dumps(self.system_prompt)}
-        ]
-    
-    def send_message(self, message: str) -> Optional[str]:
-        """Envía un mensaje al bot esquizo y retorna su respuesta."""
+        self.messages = [{
+            "role": "system",
+            "content": json.dumps(self.system_config, ensure_ascii=False)
+        }]
+        
+        if model_type == "chat":
+            self.messages.append({
+                "role": "assistant", 
+                "content": "¡Psi-activación completa! ¿En qué dimensión necesitas ayuda?"
+            })
+
+    def _validate_message_sequence(self):
+        """Valida la secuencia de mensajes para cada modelo"""
+        if self.model_type == "reasoner" and len(self.messages) > 1:
+            if self.messages[1]["role"] != "user":
+                raise RuntimeError("Primer mensaje después del system debe ser user")
+            
+        for i in range(1, len(self.messages)):
+            if self.messages[i]["role"] == self.messages[i-1]["role"]:
+                raise RuntimeError(f"Secuencia inválida: {self.messages[i-1]} → {self.messages[i]}")
+
+    def send_message(self, message: str) -> Generator[Dict[str, str], None, None]:
         try:
+            # Limpiar mensajes huérfanos
+            if self.messages[-1]["role"] == "user":
+                self.messages.pop()
+                
             self.messages.append({"role": "user", "content": message})
+            self._validate_message_sequence()
             
             response = self.client.chat.completions.create(
-                model=config.MODEL_NAME,
+                model="deepseek-reasoner" if self.model_type == "reasoner" else "deepseek-chat",
                 messages=self.messages,
                 temperature=config.TEMPERATURE,
                 max_tokens=config.MAX_TOKENS,
                 stream=config.STREAM
             )
             
-            if config.STREAM:
-                collected_messages = []
-                for chunk in response:
-                    if chunk.choices[0].delta.content:
-                        collected_messages.append(chunk.choices[0].delta.content)
-                        yield chunk.choices[0].delta.content
-                full_response = "".join(collected_messages)
-            else:
-                full_response = response.choices[0].message.content
-                yield full_response
+            full_response = {"reasoning": "", "content": ""}
             
-            self.messages.append({"role": "assistant", "content": full_response})
+            for chunk in response:
+                delta = chunk.choices[0].delta
+                chunk_data = {
+                    "content": delta.content if delta.content else "",
+                    "reasoning": delta.reasoning_content if self.model_type == "reasoner" and delta.reasoning_content else ""
+                }
+                
+                if any(chunk_data.values()):
+                    yield chunk_data
+                    full_response["reasoning"] += chunk_data["reasoning"]
+                    full_response["content"] += chunk_data["content"]
+            
+            self.messages.append({
+                "role": "assistant",
+                "content": f"{full_response['reasoning']}\n{full_response['content']}".strip()
+            })
             
         except Exception as e:
-            print(f"¡ERROR PSYCHO! 💀 Algo salió mal: {str(e)}")
-            return None
-    
+            raise RuntimeError(f"[ERROR] {str(e)}")
+
     def clear_context(self):
-        """Limpia el contexto pero mantiene el system prompt."""
-        self.messages = [self.messages[0]]  # Mantiene solo el system prompt 
+        """Reinicia contexto manteniendo compatibilidad"""
+        self.messages = [{
+            "role": "system",
+            "content": json.dumps(self.system_config, ensure_ascii=False)
+        }]
+        
+        if self.model_type == "chat":
+            self.messages.append({
+                "role": "assistant",
+                "content": "¡Conversación reiniciada! Pregunta lo que desees."
+            })

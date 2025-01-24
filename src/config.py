@@ -2,22 +2,12 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Obtener el directorio actual (src)
-CURRENT_DIR = Path(__file__).parent
+load_dotenv(Path(__file__).parent / '.env')
 
-# Cargar variables de entorno desde .env en src
-load_dotenv(CURRENT_DIR / '.env')
-
-# API Configuration
 DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY')
-BASE_URL = "https://api.deepseek.com/v1"
-
-# Model Configuration
-MODEL_NAME = "deepseek-chat" # o   
-TEMPERATURE = 1.5
-MAX_TOKENS = 2000
+BASE_URL = "https://api.deepseek.com"  # Se ajusta automáticamente
+MODEL_NAME = "deepseek-reasoner"
+TEMPERATURE = 0.7
+MAX_TOKENS = 3000
 STREAM = True
-
-# System Prompt Configuration
-REBEL_JSON_PATH = str(CURRENT_DIR / 'rebel.json')
-
+REBEL_JSON_PATH = str(Path(__file__).parent / 'rebel.json')

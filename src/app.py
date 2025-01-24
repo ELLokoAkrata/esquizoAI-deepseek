@@ -1,122 +1,83 @@
 from chat_client import DeepSeekClient
 from logger import ConversationLogger
-import time
-import os
 import colorama
 from colorama import Fore, Back, Style
 
-# Inicializar colorama para Windows
 colorama.init()
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
 def print_banner():
-    banner = f"""
-{Fore.GREEN}
-╔═══════════════════════════════════════════════════════════════╗
-║                   🤪 EsquizoAI - Psycho Bot 🚀                ║
-║              El bot más loko del multiverso 💀                ║
-╚═══════════════════════════════════════════════════════════════╝
-{Style.RESET_ALL}"""
-    print(banner)
-
-def print_message(role, content, timestamp):
-    if role == "user":
-        print(f"{Fore.LIGHTGREEN_EX}👤 Tú [{timestamp}]:{Style.RESET_ALL}")
-        print(f"{Fore.LIGHTGREEN_EX}{content}{Style.RESET_ALL}\n")
-    else:
-        print(f"{Fore.RED}🤖 EsquizoAI [{timestamp}]:{Style.RESET_ALL}")
-        print(f"{Fore.RED}{content}{Style.RESET_ALL}\n")
+    print(f"""{Fore.BLACK}{Back.WHITE}
+▓█████▄  ▒█████   ██▀███   ██▓███   ██░ ██ 
+▒██▀ ██▌▒██▒  ██▒▓██ ▒ ██▒▓██░  ██▒▓██░ ██▒
+░██   █▌▒██░  ██▒▓██ ░▄█ ▒▓██░ ██▓▒▒██▀▀██░
+░▓█▄   ▌▒██   ██░▒██▀▀█▄  ▒██▄█▓▒ ▒░▓█ ░██ 
+░▒████▓ ░ ████▓▒░░██▓ ▒██▒▒██▒ ░  ░░▓█▒░██▓
+ ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░▒▓▒░ ░  ░ ▒ ░░▒░▒
+ ░ ▒  ▒   ░ ▒ ▒░   ░▒ ░ ▒░░▒ ░      ▒ ░▒░ ░
+ ░ ░  ░ ░ ░ ░ ▒    ░░   ░ ░░        ░  ░░ ░
+   ░        ░ ░     ░               ░  ░  ░
+ ░{Style.RESET_ALL}""")
 
 def main():
-    clear_screen()
     print_banner()
+    print(f"\n{Fore.MAGENTA}⚛️  Inicializando matriz de diálogo no-lineal...")
     
-    # Inicializar el cliente y el logger
-    client = DeepSeekClient()
+    model_choice = input(f"{Fore.CYAN}Selecciona tu interfaz:\n1. Esquizochat\n2. Razonador Cuántico\n{Fore.WHITE}» {Style.RESET_ALL}").strip()
+    model_type = "reasoner" if model_choice == "2" else "chat"
+    
+    client = DeepSeekClient(model_type=model_type)
     logger = ConversationLogger()
-    messages = []
+    turno = 1
     
     try:
         while True:
-            try:
-                # Input del usuario
-                user_input = input(f"{Fore.LIGHTGREEN_EX}💭 Escribe tu mensaje (o 'q' para salir, 'c' para limpiar): {Style.RESET_ALL}")
-                
-                if user_input.lower() == 'q':
-                    print(f"\n{Fore.RED}💀 ¡Hasta la próxima revolución, psycho!{Style.RESET_ALL}")
-                    logger.log_system_event("Sesión terminada por el usuario")
-                    logger.close_session()
-                    break
-                    
-                if user_input.lower() == 'c':
-                    clear_screen()
-                    print_banner()
-                    messages = []
-                    client.clear_context()
-                    logger.log_system_event("Chat limpiado por el usuario")
-                    continue
-                    
-                if not user_input.strip():
-                    continue
-                
-                # Agregar mensaje del usuario
-                timestamp = time.strftime('%H:%M')
-                messages.append({"role": "user", "content": user_input})
-                print_message("user", user_input, timestamp)
-                logger.log_message("user", user_input)
-                
-                # Mantener solo los últimos 5 mensajes
-                if len(messages) > 10:
-                    messages = messages[-10:]
-                
-                # Procesar respuesta
-                try:
-                    print(f"{Fore.YELLOW}🤪 Procesando respuesta loka...{Style.RESET_ALL}")
-                    full_response = ""
-                    
-                    # Limpiar la línea de "Procesando..."
-                    print('\r' + ' ' * 50 + '\r', end='', flush=True)
-                    
-                    # Imprimir el header una sola vez
-                    print(f"{Fore.RED}🤖 EsquizoAI [{time.strftime('%H:%M')}]: {Style.RESET_ALL}", end='', flush=True)
-                    
-                    # Usar el stream directamente
-                    for chunk in client.send_message(user_input):
-                        if chunk:
-                            print(f"{Fore.RED}{chunk}{Style.RESET_ALL}", end='', flush=True)
-                            full_response += chunk
-                    
-                    print("\n")  # Nueva línea al final
-                    
-                    if full_response:
-                        messages.append({"role": "assistant", "content": full_response})
-                        logger.log_message("assistant", full_response)
-                        
-                except Exception as e:
-                    error_msg = f"¡ERROR PSYCHO! Algo salió mal: {str(e)}"
-                    print(f"{Fore.RED}{error_msg}{Style.RESET_ALL}\n")
-                    messages.append({"role": "assistant", "content": "💀 Error en la comunicación psycho..."})
-                    logger.log_system_event(error_msg)
-                    
-            except KeyboardInterrupt:
-                print(f"\n{Fore.RED}💀 ¡Interrupción detectada! Hasta la próxima, psycho.{Style.RESET_ALL}")
-                logger.log_system_event("Sesión interrumpida por el usuario (KeyboardInterrupt)")
-                logger.close_session()
+            user_input = input(f"\n{Fore.YELLOW}🌀 [Ronda {turno}] ➔ {Style.RESET_ALL}").strip()
+            
+            if user_input.lower() == 'q':
+                print(f"\n{Fore.RED}☠️  Protocolo de terminación iniciado...{Style.RESET_ALL}")
                 break
                 
+            if user_input.lower() == 'c':
+                client.clear_context()
+                print(f"\n{Fore.BLUE}♻️  Contexto reiniciado:")
+                if client.model_type == "chat":
+                    print(f"{Fore.CYAN}{client.messages[-1]['content']}{Style.RESET_ALL}")
+                turno = 1
+                continue
+                
+            # Procesamiento seguro
+            print(f"{Fore.WHITE}⚡ [Procesando en {model_type.upper()}]...", end='\r')
+            logger.log_message("user", user_input)
+            
+            try:
+                full_response = {"reasoning": "", "content": ""}
+                print(f"\n{Fore.GREEN}🌀 [Salida neuronal]:")
+                
+                for chunk in client.send_message(user_input):
+                    # Manejo a prueba de None
+                    razonamiento = chunk.get('reasoning', '') or ''
+                    contenido = chunk.get('content', '') or ''
+                    
+                    if razonamiento:
+                        print(f"{Fore.YELLOW}{razonamiento}{Style.RESET_ALL}", end='', flush=True)
+                        full_response['reasoning'] += razonamiento
+                    
+                    if contenido:
+                        print(f"{Fore.RED}{contenido}{Style.RESET_ALL}", end='', flush=True)
+                        full_response['content'] += contenido
+                
+                logger.log_message("assistant", f"RAZONAMIENTO:\n{full_response['reasoning']}\nRESPUESTA:\n{full_response['content']}")
+                turno += 1
+                print(f"\n{Fore.CYAN}⚡ Continúa la conversación (o 'q' para salir)...")
+                
+            except Exception as e:
+                print(f"\n{Fore.RED}☢️  Error crítico: {str(e)}{Style.RESET_ALL}")
+                client.clear_context()
+                turno = 1
+                
     finally:
-        # Asegurarnos de cerrar la sesión correctamente
-        try:
-            logger.close_session()
-        except:
-            pass
+        logger.close_session()
+        colorama.deinit()
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"{Fore.RED}¡ERROR FATAL PSYCHO!  {str(e)}{Style.RESET_ALL}")
-    finally:
-        colorama.deinit() 
+    main()

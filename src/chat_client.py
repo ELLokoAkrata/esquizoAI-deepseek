@@ -4,7 +4,8 @@ from typing import Generator, Dict, List
 import config
 
 class DeepSeekClient:
-    def __init__(self, model_type: str = "reasoner"):
+    def __init__(self, mode: str = "esquizo", model_type: str = "reasoner"):
+        self.mode = mode
         self.model_type = model_type
         self.base_url = "https://api.deepseek.com" if model_type == "reasoner" else "https://api.deepseek.com/v1"
         
@@ -13,7 +14,9 @@ class DeepSeekClient:
             base_url=self.base_url
         )
         
-        with open(config.REBEL_JSON_PATH, 'r', encoding='utf-8') as f:
+        # Cargar configuración según el modo seleccionado
+        config_path = config.MODES[mode]["config_path"]
+        with open(config_path, 'r', encoding='utf-8') as f:
             self.system_config = json.load(f)
         
         self.messages = [{
@@ -21,10 +24,15 @@ class DeepSeekClient:
             "content": json.dumps(self.system_config, ensure_ascii=False)
         }]
         
+        welcome_messages = {
+            "esquizo": "¡Psi-activación completa! ¿En qué dimensión necesitas ayuda?",
+            "nethacker": "NetHacker-X inicializado. ¿Qué análisis de red necesitas realizar?"
+        }
+        
         if model_type == "chat":
             self.messages.append({
                 "role": "assistant", 
-                "content": "¡Psi-activación completa! ¿En qué dimensión necesitas ayuda?"
+                "content": welcome_messages[mode]
             })
 
     def _validate_message_sequence(self):
@@ -77,14 +85,19 @@ class DeepSeekClient:
             raise RuntimeError(f"[ERROR] {str(e)}")
 
     def clear_context(self):
-        """Reinicia contexto manteniendo compatibilidad"""
+        """Reinicia contexto manteniendo compatibilidad con el modo actual"""
         self.messages = [{
             "role": "system",
             "content": json.dumps(self.system_config, ensure_ascii=False)
         }]
         
+        welcome_messages = {
+            "esquizo": "¡Conversación reiniciada! Pregunta lo que desees.",
+            "nethacker": "Sesión reiniciada. Listo para nuevo análisis de red."
+        }
+        
         if self.model_type == "chat":
             self.messages.append({
                 "role": "assistant",
-                "content": "¡Conversación reiniciada! Pregunta lo que desees."
+                "content": welcome_messages[self.mode]
             })

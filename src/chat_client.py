@@ -15,8 +15,8 @@ class DeepSeekClient:
         )
         
         # Cargar configuración según el modo seleccionado
-        config_path = config.MODES[mode]["config_path"]
-        with open(config_path, 'r', encoding='utf-8') as f:
+        self.mode_config = config.MODES[mode]
+        with open(self.mode_config["config_path"], 'r', encoding='utf-8') as f:
             self.system_config = json.load(f)
         
         self.messages = [{
@@ -57,7 +57,7 @@ class DeepSeekClient:
             response = self.client.chat.completions.create(
                 model="deepseek-reasoner" if self.model_type == "reasoner" else "deepseek-chat",
                 messages=self.messages,
-                temperature=config.TEMPERATURE,
+                temperature=self.mode_config["temperature"],
                 max_tokens=config.MAX_TOKENS,
                 stream=config.STREAM
             )

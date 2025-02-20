@@ -179,3 +179,130 @@ class DeepSeekClient:
 2. API responde → Se añade a `messages` local
 3. Si se excede el límite → Se mantienen últimos 10
 4. Al limpiar → Se reinician ambos historiales 
+
+### 1. Sistema Dual de Personalidades
+
+El sistema implementa dos modos de operación distintos:
+
+#### 1.1 EsquizoAI
+- **Propósito**: Interacciones creativas y pensamiento no-lineal
+- **Temperatura**: 1.5
+  - Optimizada para generación creativa y respuestas divergentes
+  - Mayor variabilidad en las salidas
+  - Ideal para brainstorming y exploración conceptual
+
+#### 1.2 NetHacker
+- **Propósito**: Análisis técnico de redes y seguridad
+- **Temperatura**: 0.3
+  - Optimizada para respuestas técnicas precisas
+  - Menor variabilidad para mantener consistencia
+  - Ideal para comandos, configuraciones y análisis
+
+### 2. Configuración del Sistema
+
+#### 2.1 Gestión de Temperatura
+```python
+MODES = {
+    "esquizo": {
+        "temperature": 1.5  # Alta para creatividad
+    },
+    "nethacker": {
+        "temperature": 0.3  # Baja para precisión
+    }
+}
+```
+
+#### 2.2 Guía de Temperaturas
+| Caso de Uso | Temperatura | Modo Recomendado |
+|-------------|-------------|------------------|
+| Análisis Técnico | 0.0-0.3 | NetHacker |
+| Configuración de Red | 0.3-0.5 | NetHacker |
+| Conversación General | 1.0-1.3 | EsquizoAI |
+| Creatividad/Poesía | 1.5 | EsquizoAI |
+
+### 3. Componentes Principales
+
+#### 3.1 Cliente de Chat (`chat_client.py`)
+- Manejo de sesiones por modo
+- Configuración dinámica de temperatura
+- Validación de secuencias de mensajes
+- Gestión de streaming de respuestas
+
+#### 3.2 Configuración (`config.py`)
+- Gestión centralizada de configuraciones
+- Rutas de archivos JSON por modo
+- Configuraciones visuales (colores)
+- Parámetros de modelo por modo
+
+#### 3.3 Archivos de Configuración JSON
+- `rebel.json`: Configuración EsquizoAI
+- `nethacker.json`: Configuración NetHacker
+
+### 4. Flujo de Datos
+
+```mermaid
+graph TD
+    A[Usuario] --> B[app.py]
+    B --> C{Selección de Modo}
+    C -->|EsquizoAI| D[Temp: 1.5]
+    C -->|NetHacker| E[Temp: 0.3]
+    D --> F[chat_client.py]
+    E --> F
+    F --> G[API DeepSeek]
+    G --> F
+    F --> B
+    B --> A
+```
+
+### 5. Consideraciones de Rendimiento
+
+#### 5.1 Modo EsquizoAI
+- Mayor consumo de tokens debido a respuestas más elaboradas
+- Posible necesidad de ajuste de `max_tokens`
+- Tiempo de respuesta variable
+
+#### 5.2 Modo NetHacker
+- Respuestas más concisas y directas
+- Menor consumo de tokens
+- Tiempo de respuesta más predecible
+
+### 6. Mejores Prácticas
+
+#### 6.1 Selección de Modo
+- Usar NetHacker para tareas técnicas precisas
+- Usar EsquizoAI para exploración creativa
+- Considerar cambiar de modo según la tarea
+
+#### 6.2 Ajuste de Temperatura
+- No modificar durante una sesión activa
+- Documentar cambios en configuración
+- Monitorear impacto en respuestas
+
+### 7. Manejo de Errores
+
+#### 7.1 Validación de Mensajes
+```python
+def _validate_message_sequence(self):
+    if self.model_type == "reasoner" and len(self.messages) > 1:
+        if self.messages[1]["role"] != "user":
+            raise RuntimeError("Secuencia inválida")
+```
+
+#### 7.2 Recuperación de Errores
+- Reinicio automático de contexto
+- Logging de errores
+- Mensajes de error amigables
+
+### 8. Roadmap Técnico
+
+#### 8.1 Mejoras Planificadas
+- [ ] Sistema de caché por modo
+- [ ] Optimización de tokens
+- [ ] Análisis de rendimiento
+- [ ] Nuevos modos especializados
+
+#### 8.2 Consideraciones Futuras
+- Integración con más modelos
+- Sistema de plugins
+- Interfaz web
+- Análisis en tiempo real 

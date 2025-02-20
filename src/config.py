@@ -21,12 +21,14 @@ MODES = {
         "name": "EsquizoAI",
         "config_path": REBEL_JSON_PATH,
         "banner_color": "MAGENTA",
-        "prompt_color": "YELLOW"
+        "prompt_color": "YELLOW",
+        "temperature": 1.5  # Alta temperatura para creatividad y caos
     },
     "nethacker": {
         "name": "NetHacker-X",
         "config_path": NETHACKER_JSON_PATH,
         "banner_color": "GREEN",
-        "prompt_color": "CYAN"
+        "prompt_color": "CYAN",
+        "temperature": 0.3  # Baja temperatura para precisión técnica
     }
 }

@@ -1,12 +1,13 @@
-# 🧠 DeepSeek - Sistema Dual de IA
+# 🧠 DeepSeek - Sistema de IA Multi-modo
 
 ## Descripción
-Sistema avanzado de IA con dos modos de operación:
+Sistema avanzado de IA con múltiples modos de operación:
 - **EsquizoAI**: Modo psico-activo para interacciones no-lineales y pensamiento divergente
 - **NetHacker**: Especialista en análisis de redes, seguridad y hacking ético
+- **MirrorReflex**: Modo introspectivo para explorar emociones simuladas
 
 ## 🚀 Características
-- Sistema dual con personalidades especializadas
+- Sistema con personalidades especializadas
 - Procesamiento de lenguaje natural avanzado
 - Interfaz CLI con diseño visual distintivo
 - Logging y gestión de contexto
@@ -47,6 +48,7 @@ python app.py
 2. Seleccionar modo:
 - 1: EsquizoAI - Modo Psico-activo
 - 2: NetHacker - Especialista en Redes
+- 3: MirrorReflex - Modo Introspectivo
 
 3. Seleccionar interfaz:
 - 1: Chat
@@ -60,7 +62,8 @@ deepseek/
 │   ├── chat_client.py   # Cliente de chat
 │   ├── config.py        # Configuración
 │   ├── rebel.json       # Config EsquizoAI
-│   └── nethacker.json   # Config NetHacker
+│   ├── nethacker.json   # Config NetHacker
+│   └── mirror.json      # Config MirrorReflex
 ├── docs/                # Documentación
 ├── requirements.txt     # Dependencias
 └── README.md           # Este archivo

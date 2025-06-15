@@ -58,7 +58,7 @@ def main():
     model_type = "reasoner" if model_choice == "2" else "chat"
     
     client = DeepSeekClient(mode=mode, model_type=model_type)
-    logger = ConversationLogger()
+    logger = ConversationLogger(mode_name=config.MODES[mode]["name"])
     turno = 1
     
     try:

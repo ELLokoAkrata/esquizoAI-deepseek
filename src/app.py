@@ -26,6 +26,13 @@ def print_banner(mode: str):
 ██║╚██╗██║██╔══╝     ██║   ██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
 ██║ ╚████║███████╗   ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
 ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+{Style.RESET_ALL}""",
+        "mirror": f"""{Fore.MAGENTA}{Back.BLACK}
+ __  __ _                     
+|  \/  (_)___  ___  _ __  
+| |\/| | / __|/ _ \| '_ \ 
+| |  | | \__ \ (_) | | | |
+|_|  |_|_|___/\___/|_| |_| 
 {Style.RESET_ALL}"""
     }
     print(banners[mode])
@@ -33,10 +40,16 @@ def print_banner(mode: str):
 def main():
     print(f"{Fore.CYAN}Selecciona tu modo de operación:")
     print(f"1. {Fore.MAGENTA}EsquizoAI - Modo Psico-activo")
-    print(f"2. {Fore.GREEN}NetHacker - Especialista en Redes{Style.RESET_ALL}")
-    
+    print(f"2. {Fore.GREEN}NetHacker - Especialista en Redes")
+    print(f"3. {Fore.MAGENTA}MirrorReflex - Modo Introspectivo{Style.RESET_ALL}")
+
     mode_choice = input(f"{Fore.WHITE}» {Style.RESET_ALL}").strip()
-    mode = "nethacker" if mode_choice == "2" else "esquizo"
+    if mode_choice == "2":
+        mode = "nethacker"
+    elif mode_choice == "3":
+        mode = "mirror"
+    else:
+        mode = "esquizo"
     
     print_banner(mode)
     print(f"\n{getattr(Fore, config.MODES[mode]['banner_color'])}⚛️  Inicializando {config.MODES[mode]['name']}...")

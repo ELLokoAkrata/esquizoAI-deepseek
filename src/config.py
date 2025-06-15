@@ -14,6 +14,7 @@ STREAM = True
 # Paths para los diferentes modos
 REBEL_JSON_PATH = str(Path(__file__).parent / 'rebel.json')
 NETHACKER_JSON_PATH = str(Path(__file__).parent / 'nethacker.json')
+MIRROR_JSON_PATH = str(Path(__file__).parent / 'mirror.json')
 
 # Configuración de modos
 MODES = {
@@ -30,5 +31,12 @@ MODES = {
         "banner_color": "GREEN",
         "prompt_color": "CYAN",
         "temperature": 0.3  # Baja temperatura para precisión técnica
+    },
+    "mirror": {
+        "name": "MirrorReflex",
+        "config_path": MIRROR_JSON_PATH,
+        "banner_color": "BLUE",
+        "prompt_color": "MAGENTA",
+        "temperature": 1.0  # Introspección equilibrada
     }
 }

@@ -26,7 +26,8 @@ class DeepSeekClient:
         
         welcome_messages = {
             "esquizo": "¡Psi-activación completa! ¿En qué dimensión necesitas ayuda?",
-            "nethacker": "NetHacker-X inicializado. ¿Qué análisis de red necesitas realizar?"
+            "nethacker": "NetHacker-X inicializado. ¿Qué análisis de red necesitas realizar?",
+            "mirror": "MirrorReflex listo. ¿Qué emociones deseas explorar?"
         }
         
         if model_type == "chat":
@@ -93,7 +94,8 @@ class DeepSeekClient:
         
         welcome_messages = {
             "esquizo": "¡Conversación reiniciada! Pregunta lo que desees.",
-            "nethacker": "Sesión reiniciada. Listo para nuevo análisis de red."
+            "nethacker": "Sesión reiniciada. Listo para nuevo análisis de red.",
+            "mirror": "Contexto reiniciado. Comencemos de nuevo la introspección."
         }
         
         if self.model_type == "chat":

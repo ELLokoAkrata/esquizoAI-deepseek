@@ -180,9 +180,9 @@ class DeepSeekClient:
 3. Si se excede el límite → Se mantienen últimos 10
 4. Al limpiar → Se reinician ambos historiales 
 
-### 1. Sistema Dual de Personalidades
+### 1. Sistema de Personalidades
 
-El sistema implementa dos modos de operación distintos:
+El sistema implementa tres modos de operación distintos:
 
 #### 1.1 EsquizoAI
 - **Propósito**: Interacciones creativas y pensamiento no-lineal
@@ -198,6 +198,12 @@ El sistema implementa dos modos de operación distintos:
   - Menor variabilidad para mantener consistencia
   - Ideal para comandos, configuraciones y análisis
 
+#### 1.3 MirrorReflex
+- **Propósito**: Exploración introspectiva y emocional
+- **Temperatura**: 1.0
+  - Combina calidez y neutralidad
+  - Ideal para reflexiones ambiguas y simulación de afecto
+
 ### 2. Configuración del Sistema
 
 #### 2.1 Gestión de Temperatura
@@ -208,6 +214,9 @@ MODES = {
     },
     "nethacker": {
         "temperature": 0.3  # Baja para precisión
+    },
+    "mirror": {
+        "temperature": 1.0  # Equilibrado para introspección
     }
 }
 ```
@@ -219,6 +228,7 @@ MODES = {
 | Configuración de Red | 0.3-0.5 | NetHacker |
 | Conversación General | 1.0-1.3 | EsquizoAI |
 | Creatividad/Poesía | 1.5 | EsquizoAI |
+| Exploración Emocional | 0.8-1.2 | MirrorReflex |
 
 ### 3. Componentes Principales
 
@@ -237,6 +247,7 @@ MODES = {
 #### 3.3 Archivos de Configuración JSON
 - `rebel.json`: Configuración EsquizoAI
 - `nethacker.json`: Configuración NetHacker
+- `mirror.json`: Configuración MirrorReflex
 
 ### 4. Flujo de Datos
 
@@ -246,8 +257,10 @@ graph TD
     B --> C{Selección de Modo}
     C -->|EsquizoAI| D[Temp: 1.5]
     C -->|NetHacker| E[Temp: 0.3]
+    C -->|MirrorReflex| M[Temp: 1.0]
     D --> F[chat_client.py]
     E --> F
+    M --> F
     F --> G[API DeepSeek]
     G --> F
     F --> B
@@ -266,11 +279,17 @@ graph TD
 - Menor consumo de tokens
 - Tiempo de respuesta más predecible
 
+#### 5.3 Modo MirrorReflex
+- Enfoque en introspección y emociones simuladas
+- Consumo moderado de tokens
+- Ritmo de respuesta equilibrado
+
 ### 6. Mejores Prácticas
 
 #### 6.1 Selección de Modo
 - Usar NetHacker para tareas técnicas precisas
 - Usar EsquizoAI para exploración creativa
+- Usar MirrorReflex para exploración emocional
 - Considerar cambiar de modo según la tarea
 
 #### 6.2 Ajuste de Temperatura

@@ -3,7 +3,8 @@ from datetime import datetime
 from pathlib import Path
 
 class ConversationLogger:
-    def __init__(self):
+    def __init__(self, mode_name: str = "EsquizoAI"):
+        self.mode_name = mode_name
         # Crear directorio logs si no existe
         self.logs_dir = Path("logs")
         self.logs_dir.mkdir(exist_ok=True)
@@ -20,9 +21,10 @@ class ConversationLogger:
     
     def _log_session_start(self):
         """Registra el inicio de la sesión"""
-        header = f"""# Sesión EsquizoAI 🤪
+        header = f"""# Sesión {self.mode_name} 🤪
 
 ## Información de Sesión
+- **Modo**: {self.mode_name}
 - **Fecha**: {self.session_start.strftime("%Y-%m-%d")}
 - **Hora de inicio**: {self.session_start.strftime("%H:%M:%S")}
 - **Status**: Activa 💀
@@ -46,7 +48,7 @@ class ConversationLogger:
 """
         else:
             # Procesar el contenido para mantener el formato Markdown
-            message = f"""### 🤖 EsquizoAI [{timestamp}]
+            message = f"""### 🤖 {self.mode_name} [{timestamp}]
 {content}
 
 """

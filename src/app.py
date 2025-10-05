@@ -19,6 +19,14 @@ def print_banner(mode: str):
  ░ ░  ░ ░ ░ ░ ▒    ░░   ░ ░░        ░  ░░ ░
    ░        ░ ░     ░               ░  ░  ░
  ░{Style.RESET_ALL}""",
+        "oracle": f"""{Fore.YELLOW}{Back.BLACK}
+╔═══╗────────╔╗──╔╗─────────╔╗
+║╔═╗║────────║║──║║─────────║║
+║║─║╠══╦╗╔╦══╣║╔═╝╠══╦═╗╔══╣║╔╦══╗
+║╚═╝║║═╣║║║╔═╣║║╔╗║║═╣╔╗╣║═╣║║║══╣
+║╔═╗║║═╣╚╝║╚═╣╚╣╚╝║║═╣║║║║═╣╚╣╠══║
+╚╝─╚╩══╩══╩══╩═╩══╩══╩╝╚╩══╩═╩╩══╝
+{Style.RESET_ALL}""",
         "nethacker": f"""{Fore.GREEN}{Back.BLACK}
 ███╗   ██╗███████╗████████╗██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗██████╗ 
 ████╗  ██║██╔════╝╚══██╔══╝██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
@@ -41,13 +49,16 @@ def main():
     print(f"{Fore.CYAN}Selecciona tu modo de operación:")
     print(f"1. {Fore.MAGENTA}EsquizoAI - Modo Psico-activo")
     print(f"2. {Fore.GREEN}NetHacker - Especialista en Redes")
-    print(f"3. {Fore.MAGENTA}MirrorReflex - Modo Introspectivo{Style.RESET_ALL}")
+    print(f"3. {Fore.MAGENTA}MirrorReflex - Modo Introspectivo")
+    print(f"4. {Fore.YELLOW}PsychoOracle - Oráculo Multidimensional{Style.RESET_ALL}")
 
     mode_choice = input(f"{Fore.WHITE}» {Style.RESET_ALL}").strip()
     if mode_choice == "2":
         mode = "nethacker"
     elif mode_choice == "3":
         mode = "mirror"
+    elif mode_choice == "4":
+        mode = "oracle"
     else:
         mode = "esquizo"
     
@@ -56,7 +67,13 @@ def main():
     
     model_choice = input(f"{Fore.CYAN}Selecciona tu interfaz:\n1. Chat\n2. Razonador\n{Fore.WHITE}» {Style.RESET_ALL}").strip()
     model_type = "reasoner" if model_choice == "2" else "chat"
-    
+
+    # Definir color de respuesta final según modo
+    if mode == "esquizo":
+        esquizo_response_color = Fore.RED
+    else:
+        esquizo_response_color = getattr(Fore, config.MODES[mode].get('response_color', 'WHITE'))
+
     client = DeepSeekClient(mode=mode, model_type=model_type)
     logger = ConversationLogger(mode_name=config.MODES[mode]["name"])
     turno = 1
@@ -89,13 +106,18 @@ def main():
                 for chunk in client.send_message(user_input):
                     razonamiento = chunk.get('reasoning', '') or ''
                     contenido = chunk.get('content', '') or ''
-                    
+
                     if razonamiento:
                         print(f"{prompt_color}{razonamiento}{Style.RESET_ALL}", end='', flush=True)
                         full_response['reasoning'] += razonamiento
-                    
+
                     if contenido:
-                        print(f"{Fore.WHITE}{contenido}{Style.RESET_ALL}", end='', flush=True)
+                        # Si es modo esquizo, la respuesta final va en rojo
+                        if mode == "esquizo":
+                            response_color = esquizo_response_color
+                        else:
+                            response_color = getattr(Fore, config.MODES[mode].get('response_color', 'WHITE'))
+                        print(f"{response_color}{contenido}{Style.RESET_ALL}", end='', flush=True)
                         full_response['content'] += contenido
                 
                 logger.log_message("assistant", f"RAZONAMIENTO:\n{full_response['reasoning']}\nRESPUESTA:\n{full_response['content']}")
